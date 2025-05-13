@@ -1,0 +1,17 @@
+package com.dima.booksbackend.repositories;
+
+import com.dima.booksbackend.models.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Integer> {
+
+    Book findByName(String name);
+
+    Book findById(int id);
+
+    void deleteById(int id);
+
+    boolean existsByName(String name);
+}
