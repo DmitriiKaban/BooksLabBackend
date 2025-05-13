@@ -23,7 +23,7 @@ public class AuthenticationService {
                 )
         );
 
-        User user = userService.loadUserByUsername(input.getUsername());
+        User user = userService.loadUserByEmail(input.getUsername());
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + input.getUsername());

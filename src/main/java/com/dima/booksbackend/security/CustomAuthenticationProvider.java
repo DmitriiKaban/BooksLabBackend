@@ -20,7 +20,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         try {
-            User userDetails = customUserDetailService.loadUserByUsername(authentication.getName());
+            User userDetails = customUserDetailService.loadUserByEmail(authentication.getName());
             return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
         } catch (UsernameNotFoundException e) {
             throw new BadCredentialsException("Invalid Credentials");

@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
-    Book findByName(String name);
+    Book findByTitle(String title);
 
     Book findById(int id);
 
     void deleteById(int id);
-
-    boolean existsByName(String name);
 }

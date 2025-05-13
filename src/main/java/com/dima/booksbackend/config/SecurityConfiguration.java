@@ -31,7 +31,8 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth_requests -> auth_requests
-                        .requestMatchers("/auth/**", "/test/login").permitAll() // Include /test/login for testing
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/books/deleteBook", "/books/updateBook").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

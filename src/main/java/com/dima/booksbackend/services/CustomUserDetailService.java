@@ -13,8 +13,8 @@ public class CustomUserDetailService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.loadUserByUsername(username);
+    public User loadUserByEmail(String username) throws UsernameNotFoundException {
+        User user = userService.loadUserByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }

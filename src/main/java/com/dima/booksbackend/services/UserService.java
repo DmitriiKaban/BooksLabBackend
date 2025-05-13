@@ -16,13 +16,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOpt = userRepository.findByFullName(username);
-        return userOpt.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-    }
-
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    public User loadUserByEmail(String username) {
+        Optional<User> userOpt = userRepository.findByEmail(username);
+        return userOpt.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }
 }
