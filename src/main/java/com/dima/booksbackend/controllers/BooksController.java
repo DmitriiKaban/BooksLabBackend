@@ -24,11 +24,11 @@ public class BooksController {
         return ResponseEntity.ok(Map.of("books", books));
     }
 
-
     @PostMapping("/addBook")
-    public ResponseEntity<Book> addBook(@RequestBody Book book) {
-        Book savedBook = bookService.addBook(book);
-        return ResponseEntity.ok(savedBook);
+    public ResponseEntity<Map<String, String>> saveBook(@RequestBody Map<String, Book> book) {
+        bookService.saveBook(book.get("book"));
+        System.out.println("saved");
+        return ResponseEntity.ok(Map.of("message", "Book saved"));
     }
 
     @PostMapping("/deleteBook")

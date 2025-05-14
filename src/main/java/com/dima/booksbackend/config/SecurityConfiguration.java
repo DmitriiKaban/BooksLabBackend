@@ -33,7 +33,7 @@ public class SecurityConfiguration {
 //                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth_requests -> auth_requests
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/books/deleteBook", "/books/updateBook").hasRole("ADMIN")
+                        .requestMatchers("/books/deleteBook", "/books/updateBook", "/books/addBook").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
