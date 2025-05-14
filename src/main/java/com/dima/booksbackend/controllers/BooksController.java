@@ -2,12 +2,14 @@ package com.dima.booksbackend.controllers;
 
 
 import com.dima.booksbackend.models.Book;
+import com.dima.booksbackend.models.Books;
 import com.dima.booksbackend.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/books")
 @RestController
@@ -17,10 +19,11 @@ public class BooksController {
     private final BookService bookService;
 
     @GetMapping("/getBooks")
-    public ResponseEntity<List<Book>> authenticate() {
+    public ResponseEntity<Map<String, List<Book>>> getBooks() {
         List<Book> books = bookService.getAllBooks();
-        return ResponseEntity.ok(books);
+        return ResponseEntity.ok(Map.of("books", books));
     }
+
 
     @PostMapping("/addBook")
     public ResponseEntity<Book> addBook(@RequestBody Book book) {

@@ -29,7 +29,8 @@ public class SecurityConfiguration {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+//                .cors(Customizer.withDefaults())
+                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth_requests -> auth_requests
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/books/deleteBook", "/books/updateBook").hasRole("ADMIN")
