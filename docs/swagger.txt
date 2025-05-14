@@ -1,0 +1,272 @@
+openapi: 3.0.4
+info:
+  title: Books API
+  description: API for managing a personal collection of books, including authentication.
+  version: 1.0.0 # Your API version
+
+# Assuming your service runs locally on port 8080. Adjust if necessary.
+servers:
+  - url: http://localhost:8080 # Example: Assuming base URL is just the host and port
+    description: Local development server
+
+tags:
+  - name: books
+    description: Operations related to books
+  - name: auth
+    description: Authentication operations
+
+# Define the security scheme for JWT (Bearer token)
+# This describes *how* authentication works (using a Bearer token in the Authorization header)
+components:
+  securitySchemes:
+    bearerAuth:            # Choose a name for your security scheme (e.g., bearerAuth)
+      type: http           # The type of security scheme (HTTP authentication)
+      scheme: bearer       # The HTTP authorization scheme to use (Bearer)
+      bearerFormat: JWT    # Optional: Specify the format of the bearer token (JWT is common)
+      description: Enter your JWT token in the format **Bearer &lt;token&gt;**
+
+  schemas:
+    # Existing schemas (Book, BookListResponse, BookIdRequest, BookUpdateRequest, MessageResponse) go here
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the book.
+          example: 1
+        title:
+          type: string
+          description: The title of the book.
+          example: Ведзьмак
+        author:
+          type: string
+          description: The author of the book.
+          example: Анджей Сапковский
+        year:
+          type: integer
+          description: The publication year of the book.
+          example: 1986
+        rating:
+          type: number
+          format: double
+          description: The rating of the book.
+          example: 10.0
+        readYear:
+          type: integer
+          description: The year the book was read.
+          example: 2020
+        comments:
+          type: string
+          description: Comments about the book.
+          example: классика
+        image:
+          type: string
+          format: url
+          description: URL of the book cover image.
+          example: https://cdn.librarius.md/img/original/vedimak_1432886167.jpg
+        genre:
+          type: string
+          description: The genre of the book.
+          example: Fantasy
+
+    BookInput:
+      allOf:
+        - $ref: '#/components/schemas/Book'
+
+    BookListResponse:
+      type: object
+      properties:
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+
+    BookIdRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The ID of the book to delete.
+          example: 1
+
+    BookUpdateRequest:
+      type: object
+      properties:
+        book:
+          $ref: '#/components/schemas/Book'
+          description: The book object with updated details.
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A message indicating the result of the operation.
+          example: Book deleted
+
+    # New schemas for Authentication
+    LoginUserDto:
+      type: object
+      properties:
+        username: # Based on your LoginUserDto
+          type: string
+          description: User's username or email for login.
+          example: user@example.com
+        password:
+          type: string
+          description: User's password.
+          format: password # Mark as password for UI/tooling hints
+          example: mysecretpassword
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT authentication token.
+          example: eyJhbGciOiJIUzI1NiI... # Example JWT token
+        expiresIn:
+          type: integer
+          format: int64 # Adjust format based on what JwtService::getExpirationTime returns (seconds, milliseconds, etc.)
+          description: Token expiration time (e.g., in seconds from now or Unix timestamp).
+          example: 3600 # Example: expires in 3600 seconds
+        username: # Based on authenticatedUser.getFullName()
+          type: string
+          description: Full name or username of the authenticated user.
+          example: Dima Developer
+      required:
+        - token
+        - expiresIn
+        - username
+
+
+# Apply security globally to all paths by default
+# This means all endpoints will require the 'bearerAuth' security scheme
+security:
+  - bearerAuth: [] # This references the security scheme defined above
+
+paths:
+  # Define the new login endpoint
+  /auth/login:
+    post:
+      tags:
+        - auth # Associate with the 'auth' tag
+      summary: Authenticate user and get JWT token.
+      operationId: loginUser # Unique identifier for this operation
+      description: Sends user credentials (username/email and password) to receive a JWT for authenticating future requests.
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserDto' # Reference the LoginUserDto schema
+      responses:
+        '200':
+          description: Successful authentication, returns JWT token and expiration details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse' # Reference the LoginResponse schema
+        '401':
+          description: Unauthorized - Invalid credentials provided.
+        # Add other potential error responses here (e.g., '500' for server errors)
+
+      # OVERRIDE global security: This specific endpoint requires NO security
+      # An empty array means no security requirements apply to this operation
+      security: []
+
+  # Existing /books paths
+  # These paths will automatically inherit the global 'bearerAuth' requirement defined above
+  /books/getBooks:
+    get:
+      tags:
+        - books
+      summary: Get all books.
+      operationId: getAllBooks
+      description: Retrieves a list of all books in the collection. Requires authentication.
+      # The security requirement is inherited from the global 'security' section
+      responses:
+        '200':
+          description: Successful operation, returns a list of books.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookListResponse'
+        # Add other responses, e.g., '401': description: Unauthorized
+
+  /books/addBook:
+    post:
+      tags:
+        - books
+      summary: Add a new book.
+      operationId: addBook
+      description: Adds a new book record to the collection. Requires authentication.
+      requestBody:
+        description: Book object to add.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        '200':
+          description: Book added successfully, returns the saved book object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        # Add other responses, e.g., '401': description: Unauthorized, '400': Invalid input
+
+  /books/deleteBook:
+    post:
+      tags:
+        - books
+      summary: Delete a book by ID.
+      operationId: deleteBook
+      description: Deletes a book record based on its ID. Requires authentication.
+      requestBody:
+        description: JSON object containing the ID of the book to delete.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookIdRequest'
+      responses:
+        '200':
+          description: Book deleted successfully, returns a confirmation message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        # Add other responses, e.g., '401': Unauthorized, '404': Book not found
+
+  /books/updateBook:
+    post:
+      tags:
+        - books
+      summary: Update an existing book.
+      operationId: updateBook
+      description: Updates an existing book record. Requires authentication.
+      requestBody:
+        description: JSON object containing the book object with updated details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpdateRequest'
+      responses:
+        '200':
+          description: Book updated successfully, returns a confirmation message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        # Add other responses, e.g., '401': Unauthorized, '400': Invalid input, '404': Book not found
+
+# ... (optional externalDocs section) ...
