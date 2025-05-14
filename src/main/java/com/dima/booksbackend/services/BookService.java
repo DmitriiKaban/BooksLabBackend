@@ -4,6 +4,8 @@ import com.dima.booksbackend.exceptions.BookNotFoundException;
 import com.dima.booksbackend.models.Book;
 import com.dima.booksbackend.repositories.BookRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +33,6 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book addBook(Book book) {
-        return bookRepository.save(book);
-    }
-
     public void deleteBook(Integer book) {
         bookRepository.deleteById(book);
     }
@@ -45,5 +43,9 @@ public class BookService {
             return bookRepository.save(book);
         }
         throw new BookNotFoundException("Book with id: " + book.getId() + " doesn't exist");
+    }
+
+    public Page<Book> getBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 }

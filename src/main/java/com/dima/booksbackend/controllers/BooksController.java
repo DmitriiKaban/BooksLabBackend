@@ -4,11 +4,12 @@ import com.dima.booksbackend.exceptions.BookNotFoundException;
 import com.dima.booksbackend.models.Book;
 import com.dima.booksbackend.services.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/books")
@@ -19,8 +20,11 @@ public class BooksController {
     private final BookService bookService;
 
     @GetMapping()
-    public ResponseEntity<Map<String, List<Book>>> getBooks() {
-        List<Book> books = bookService.getAllBooks();
+    public ResponseEntity<Map<String, Page<Book>>> getBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
+    ) {
+        Page<Book> books = bookService.getBooks(PageRequest.of(page, size));
         return ResponseEntity.ok(Map.of("books", books));
     }
 

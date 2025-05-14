@@ -16,6 +16,7 @@ public class AuthenticationService {
     private final UserService userService;
 
     public User authenticate(LoginUserDto input) {
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getUsername(),
@@ -24,7 +25,6 @@ public class AuthenticationService {
         );
 
         User user = userService.loadUserByEmail(input.getUsername());
-
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + input.getUsername());
         }
