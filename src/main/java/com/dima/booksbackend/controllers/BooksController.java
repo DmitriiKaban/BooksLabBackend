@@ -1,10 +1,9 @@
 package com.dima.booksbackend.controllers;
 
-
 import com.dima.booksbackend.models.Book;
-import com.dima.booksbackend.models.Books;
 import com.dima.booksbackend.services.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,25 +24,34 @@ public class BooksController {
     }
 
     @PostMapping("/addBook")
-    public ResponseEntity<Book> saveBook(@RequestBody Map<String, Book> book) {
-        Book savedBook = bookService.saveBook(book.get("book"));
-        System.out.println("saved");
-        return ResponseEntity.ok(savedBook);
+    public ResponseEntity<Book> addBook(@RequestBody Map<String, Book> requestBody) {
+        Book book = requestBody.get("book");
+        if (book == null) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request
+        }
+        Book savedBook = bookService.saveBook(book);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook); // Use 201 Created
     }
 
-    @PostMapping("/deleteBook")
+    @DeleteMapping("/deleteBook")
     public ResponseEntity<Map<String, String>> deleteBook(@RequestBody Map<String, Integer> request) {
         Integer id = request.get("id");
+        if (id == null) {
+            return ResponseEntity.badRequest().build();
+        }
         bookService.deleteBook(id);
-        return ResponseEntity.ok(Map.of("message", "Book deleted"));
+        return ResponseEntity.ok(Map.of("message", "Book deleted with ID: " + id)); // 200 OK with message
     }
 
 
-    @PostMapping("/updateBook")
-    public ResponseEntity<Map<String, String>> updateBook(@RequestBody Map<String, Book> book) {
-        bookService.updateBook(book.get("book"));
-        System.out.println("updated");
-        return ResponseEntity.ok(Map.of("message", "Book updated"));
+    @PatchMapping("/updateBook")
+    public ResponseEntity<Map<String, String>> updateBook(@RequestBody Map<String, Book> requestBody) {
+        Book book = requestBody.get("book");
+        if (book == null || book.getId() == 0) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request
+        }
+        bookService.updateBook(book);
+        return ResponseEntity.ok(Map.of("message", "Book with ID " + book.getId() + " updated"));
     }
 
 }
