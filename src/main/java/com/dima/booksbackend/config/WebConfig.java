@@ -5,11 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001")); // Adjust if your frontend runs on a different port
 
         // Allow common HTTP methods
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
         // Allow all headers
         configuration.setAllowedHeaders(List.of("*"));

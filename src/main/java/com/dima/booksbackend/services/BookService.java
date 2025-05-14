@@ -1,5 +1,6 @@
 package com.dima.booksbackend.services;
 
+import com.dima.booksbackend.exceptions.BookNotFoundException;
 import com.dima.booksbackend.models.Book;
 import com.dima.booksbackend.repositories.BookRepository;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,10 @@ public class BookService {
     }
 
     public Book updateBook(Book book) {
-        return bookRepository.save(book);
+
+        if (bookRepository.existsById(book.getId())) {
+            return bookRepository.save(book);
+        }
+        throw new BookNotFoundException("Book with id: " + book.getId() + " doesn't exist");
     }
 }

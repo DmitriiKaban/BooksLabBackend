@@ -4,6 +4,7 @@ import com.dima.booksbackend.security.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,7 +34,10 @@ public class SecurityConfiguration {
 //                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth_requests -> auth_requests
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/books/deleteBook", "/books/updateBook", "/books/addBook").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/books").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/books").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
