@@ -32,15 +32,18 @@ public class BooksController {
     }
 
     @PostMapping("/deleteBook")
-    public ResponseEntity<Void> deleteBook(@RequestBody Integer id) {
+    public ResponseEntity<Map<String, String>> deleteBook(@RequestBody Map<String, Integer> request) {
+        Integer id = request.get("id");
         bookService.deleteBook(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("message", "Book deleted"));
     }
 
+
     @PostMapping("/updateBook")
-    public ResponseEntity<Book> updateBook(@RequestBody Book book) {
-        Book updatedBook = bookService.updateBook(book);
-        return ResponseEntity.ok(updatedBook);
+    public ResponseEntity<Map<String, String>> updateBook(@RequestBody Map<String, Book> book) {
+        bookService.updateBook(book.get("book"));
+        System.out.println("updated");
+        return ResponseEntity.ok(Map.of("message", "Book updated"));
     }
 
 }

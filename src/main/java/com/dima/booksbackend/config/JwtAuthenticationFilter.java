@@ -51,15 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (userEmail != null && authentication == null) {
 
-                System.out.println("User email: " + userEmail);
-
                 User userDetails = userService.findByEmail(userEmail);
 
                 if (userDetails == null) {
                     throw new RuntimeException("User not found");
                 }
 
-                System.out.println("User details: " + userDetails);
+                System.out.println("User auth " + userDetails.getAuthorities());
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -75,6 +73,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
+            // handlerExceptionResolver.resolveException(request, response, null, exception);
+            exception.printStackTrace(); // <-- See what went wrong
+
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }

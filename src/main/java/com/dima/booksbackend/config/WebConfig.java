@@ -3,6 +3,7 @@ package com.dima.booksbackend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -10,39 +11,34 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .allowedHeaders("*")
-                .allowCredentials(false)
-                .maxAge(28800);
-    }
-
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow all origins
-        config.addAllowedOrigin("*");
+        // Allow frontend origin
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001")); // Adjust if your frontend runs on a different port
 
-        // Allow all HTTP methods
-        config.addAllowedMethod("*");
+        // Allow common HTTP methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // Allow all headers
-        config.addAllowedHeader("*");
+        configuration.setAllowedHeaders(List.of("*"));
 
-        // Set max age
-        config.setMaxAge(28800L);
+        // Allow credentials (cookies, authorization headers)
+        configuration.setAllowCredentials(true);
 
-        source.registerCorsConfiguration("/**", config);
+        // Expose these headers to the frontend
+        configuration.setExposedHeaders(List.of("Authorization"));
 
-        return new CorsFilter(source);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
 
