@@ -35,6 +35,8 @@ public class SecurityConfiguration {
                 .cors(c -> c.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth_requests -> auth_requests
                         .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/books").permitAll()
                         .anyRequest().authenticated()
                 )
